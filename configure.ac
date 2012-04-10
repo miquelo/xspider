@@ -11,6 +11,7 @@ AC_CONFIG_FILES([
 	include/Makefile
 	lib/Makefile
 ])
+PKG_CHECK_MODULES([LIBXML2],[libxml-2.0])
 DX_HTML_FEATURE(ON)
 DX_CHM_FEATURE(OFF)
 DX_CHI_FEATURE(OFF)
