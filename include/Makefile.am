@@ -1,5 +1,6 @@
 pkginclude_HEADERS = \
-	reference.h
+	reference.h \
+	uri.h
 	
 EXTRADIST = \
 	doxygen.h
