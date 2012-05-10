@@ -7,9 +7,9 @@ AC_PROG_LIBTOOL
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
 	Makefile
+	lib/Makefile
 	bin/Makefile
 	include/Makefile
-	lib/Makefile
 ])
 PKG_CHECK_MODULES([LIBXML2],[libxml-2.0])
 DX_HTML_FEATURE(ON)
