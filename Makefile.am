@@ -3,9 +3,9 @@ include $(top_srcdir)/config/doxygen.am
 ACLOCAL_AMFLAGS = -I m4 --install
 
 SUBDIRS = \
+	lib \
 	bin \
-	include \
-	lib
+	include
 
 EXTRADIST = \
 	AUTHORS \
