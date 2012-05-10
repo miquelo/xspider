@@ -172,7 +172,7 @@ void abnf_matcher_rep::commit_impl(void)
 	while (it not_eq _m_vect.end())
 		(*it++)->commit();
 }
-#include <iostream>
+
 bool abnf_matcher_rep::match_impl(istream& is)
 {
 	bool mismatched = false;
