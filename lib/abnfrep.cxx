@@ -39,12 +39,12 @@ public abnf_matcher
 	 */
 	abnf_matcher_rep(abnf_rule_ri& r, int r_min, int r_max, abnf_rule_ri& ru):
 	abnf_matcher(r),
+	_min(r_min),
 	_max(r_max),
 	_ru(ru),
-	_first_try(true)
+	_count(_min),
+	_last_pos(-1l)
 	{
-		for (int i = 0; i < r_min; ++i)
-			_m_vect.push_back(_ru.matcher_new());
 	}
 	
 	/*
@@ -72,20 +72,11 @@ public abnf_matcher
 			
 	private:
 	
-	const int _max;
+	const int _min, _max;
 	abnf_rule_ri& _ru;
-	bool _first_try;
+	int _count;
+	std::streampos _last_pos;
 	std::vector<abnf_matcher*> _m_vect;
-	
-	void _reset_remaining(const std::vector<abnf_matcher*>::iterator from)
-	{
-		std::vector<abnf_matcher*>::iterator it = from;
-		while (it not_eq _m_vect.end())
-		{
-			delete *it;
-			*it++ = _ru.matcher_new();
-		}
-	}
 };
 
 /*
@@ -172,11 +163,7 @@ abnf_matcher_rep::~abnf_matcher_rep(void)
 
 bool abnf_matcher_rep::availability_test(void) const
 {
-	vector<abnf_matcher*>::const_iterator it = _m_vect.begin();
-	while (it not_eq _m_vect.end())
-		if ((*it)->available())
-			return true;
-	return _m_vect.size() < _max;
+	return _count not_eq -1;
 }
 
 void abnf_matcher_rep::commit_impl(void)
@@ -188,57 +175,51 @@ void abnf_matcher_rep::commit_impl(void)
 #include <iostream>
 bool abnf_matcher_rep::match_impl(istream& is)
 {
-	if (_first_try)
-	{
-		cout << "matched = true, size = 0" << endl;
-		
-		_first_try = false;
-		if (_m_vect.empty())
-			return true;
-	}
-	
-	bool avail = false;
-	vector<abnf_matcher*>::reverse_iterator rit = _m_vect.rbegin();
-	while (rit not_eq _m_vect.rend() and not avail)
-		if (not (avail = (*rit)->available()))
-			++rit;
-	if (avail)
-	{
-		if (rit not_eq _m_vect.rbegin())
-			_reset_remaining(rit.base() + 1);
-		(*rit)->mismatch();
-	}
-	else if (_m_vect.size() < _max)
-		_m_vect.push_back(_ru.matcher_new());
-	
 	bool mismatched = false;
-	bool matched = false;
-	bool rollback = false;
-	vector<abnf_matcher*>::iterator it = _m_vect.begin();
+	bool matched = _count == 0;
+	
+	if (_last_pos == -1l)
+		_last_pos = stream_beg();
 	
 	while (not mismatched and not matched)
 	{
-		abnf_matcher* m = *it;
-	
-		if (rollback)
+		if (_m_vect.empty())
+			_m_vect.push_back(_ru.matcher_new());
+			
+		is.seekg(_last_pos);
+		
+		if (_m_vect.back()->match(is))
 		{
-			is.seekg(m->stream_beg());
-			m->mismatch();
-			rollback = false;
+			_last_pos = _m_vect.back()->stream_end();
+			
+			if (_m_vect.size() == _count)
+				matched = true;
+			else
+				_m_vect.push_back(_ru.matcher_new());
 		}
-	
-		if (m->match(is))
-			matched = ++it == _m_vect.end();
-		else if (it == _m_vect.begin())
-			mismatched = true;
 		else
 		{
-			rollback = true;
-			_reset_remaining(it--);
+			delete _m_vect.back();
+			_m_vect.pop_back();
+			_count = max(_count - 1, _min);
+			
+			if (_m_vect.empty())
+				mismatched = true;
+			else
+			{
+				_m_vect.back()->mismatch();
+				_last_pos = _m_vect.back()->stream_beg();
+			}
 		}
 	}
-	cout << "matched = " << (matched ? "true" : "false");
-	cout << ", size = " << _m_vect.size() << endl;
+	
+	if (_count == _max)
+		_count == -1;
+	else
+	{
+		++_count;
+		_m_vect.push_back(_ru.matcher_new());
+	}
 	return matched;
 }
 

@@ -160,7 +160,6 @@ void abnf_matcher_con::commit_impl(void)
 	_mr->commit();
 }
 
-#include <iostream>
 bool abnf_matcher_con::match_impl(istream& is)
 {
 	bool matched = false;
@@ -173,16 +172,7 @@ bool abnf_matcher_con::match_impl(istream& is)
 			_mr = (_ml->mismatch(), delete _mr, _rr.matcher_new());
 		
 		if (_ml->match(is))
-		{
-			cout << "left match!";
 			matched = (_mr->mismatch(), _mr->match(is));
-			if (matched)
-				cout << " right match!" << endl;
-			else
-				cout << " right mismatch!" << endl;
-		}
-		else
-			cout << "left mismatch!" << endl;
 	}
 	while (not matched and _ml->available());
 	
