@@ -196,22 +196,20 @@ bool abnf_matcher_rep::match_impl(istream& is)
 		if (_m_vect.empty())
 			return true;
 	}
-	else
+	
+	bool avail = false;
+	vector<abnf_matcher*>::reverse_iterator rit = _m_vect.rbegin();
+	while (rit not_eq _m_vect.rend() and not avail)
+		if (not (avail = (*rit)->available()))
+			++rit;
+	if (avail)
 	{
-		bool avail = false;
-		vector<abnf_matcher*>::reverse_iterator rit = _m_vect.rbegin();
-		while (rit not_eq _m_vect.rend() and not avail)
-			if (not (avail = (*rit)->available()))
-				++rit;
-		if (avail)
-		{
-			if (rit not_eq _m_vect.rbegin())
-				_reset_remaining(rit.base() + 1);
-			(*rit)->mismatch();
-		}
-		else if (_m_vect.size() < _max)
-			_m_vect.push_back(_ru.matcher_new());
+		if (rit not_eq _m_vect.rbegin())
+			_reset_remaining(rit.base() + 1);
+		(*rit)->mismatch();
 	}
+	else if (_m_vect.size() < _max)
+		_m_vect.push_back(_ru.matcher_new());
 	
 	bool mismatched = false;
 	bool matched = false;
