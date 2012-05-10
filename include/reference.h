@@ -207,39 +207,6 @@ class reference
 	}
 	
 	/*!
-	 * \brief Checks if the instance managed by this reference and the instance
-	 * managed by the given reference are the same.
-	 *
-	 * \retval
-	 *			true if they are the same;
-	 * \retval
-	 *			false otherwise.
-	 */
-	bool operator == (const reference<type>& ref)
-	{
-		return _ptr == ref._ptr;
-	}
-	
-	/*!
-	 * \brief Checks if the instance managed by this reference and the instance
-	 * managed by the given reference are the same.
-	 *
-	 * \tparam some_type
-	 *			All types are valid since whole instance addresses are
-	 *			comparable independently of its type.
-	 *
-	 * \retval
-	 *			true if they are the same;
-	 * \retval
-	 *			false otherwise.
-	 */
-	template <typename some_type>
-	bool operator == (const reference<some_type>& ref)
-	{
-		return _ptr == ref._ptr;
-	}
-	
-	/*!
 	 * \brief Makes the instance managed by another reference of the same type
 	 * to be managed by this reference.
 	 *
@@ -306,6 +273,42 @@ class reference
 	}
 	
 	/*!
+	 * \brief Returns a constant reference to the instance managed object by
+	 * this reference.
+	 *
+	 * \return
+	 *			The constant deferenced instance.
+	 *
+	 * \throw bad_pointer
+	 *			If this reference is empty.
+	 */
+	const type& operator * (void) const
+	throw (bad_pointer)
+	{
+		if (_ptr == NULL)
+			throw bad_pointer();
+		return *_ptr;
+	}
+	
+	/*!
+	 * \brief Returns a reference to the instance managed object by this
+	 * reference.
+	 *
+	 * \return
+	 *			The deferenced instance.
+	 *
+	 * \throw bad_pointer
+	 *			If this reference is empty.
+	 */
+	type& operator * (void)
+	throw (bad_pointer)
+	{
+		if (_ptr == NULL)
+			throw bad_pointer();
+		return *_ptr;
+	}
+	
+	/*!
 	 * \brief Returns the constant address of the instance managed by this
 	 * reference in order to be accessed.
 	 *
@@ -339,6 +342,64 @@ class reference
 		if (_ptr == NULL)
 			throw bad_pointer();
 		return _ptr;
+	}
+	
+	/*!
+	 * \brief Checks if the instance managed by this reference and the instance
+	 * managed by the given reference are the same.
+	 *
+	 * \tparam some_type
+	 *			All types are valid since whole instance addresses are
+	 *			comparable independently of its type.
+	 *
+	 * \retval
+	 *			true if they are the same;
+	 * \retval
+	 *			false otherwise.
+	 */
+	template <typename some_type>
+	bool operator == (const reference<some_type>& ref)
+	{
+		return _ptr == ref._ptr;
+	}
+	
+	/*!
+	 * \brief Checks if the instance managed by this reference and the instance
+	 * managed by the given reference are not the same.
+	 *
+	 * \tparam some_type
+	 *			All types are valid since whole instance addresses are
+	 *			comparable independently of its type.
+	 *
+	 * \retval
+	 *			true if they are not the same;
+	 * \retval
+	 *			false otherwise.
+	 */
+	template <typename some_type>
+	bool operator not_eq (const reference<some_type>& ref)
+	{
+		return _ptr not_eq ref._ptr;
+	}
+	
+	/*!
+	 * \brief Checks if the pointer of this reference is less than the pointer
+	 * the given reference.
+	 *
+	 * \tparam some_type
+	 *			All types are valid since whole instance addresses are
+	 *			comparable independently of its type.
+	 *
+	 * \retval
+	 *			true if the pointer of this reference is less than than the
+	 *			pointer of the given reference;
+	 * \retval
+	 *			false otherwise.
+	 */
+	template <typename some_type>
+	bool operator < (const reference<some_type>& ref)
+	{
+		return _ptr < ref._ptr;
 	}
 	
 	private:
