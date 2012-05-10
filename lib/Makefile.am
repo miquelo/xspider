@@ -6,7 +6,22 @@ libxspiderplat_la_CPPFLAGS = \
 	`pkg-config --cflags libxml-2.0`
 	
 libxspiderplat_la_LDFLAGS = \
+	-version-info 1:0:0 \
 	`pkg-config --libs libxml-2.0`
 	
 libxspiderplat_la_SOURCES = \
-	action.cxx
+	abnfalt.cxx \
+	abnfcon.cxx \
+	abnfm.cxx \
+	abnfr.cxx \
+	abnfralt.cxx \
+	abnfrep.cxx \
+	abnfrset.cxx \
+	abnfterch.cxx \
+	abnfterfn.cxx \
+	abnfterstr.cxx \
+	uri.cxx
+	
+libxspiderplat_la_INCLUDES = \
+	abnfm.h \
+	abnfr.h

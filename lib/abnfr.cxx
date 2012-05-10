@@ -17,43 +17,57 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  */
- 
-#error "DO NOT INCLUDE THIS FILE"
 
-/*!
- * \file
- * \brief Global definitions. Dot not include it.
- *
- * \namespace std
- * \brief Standard C++ Library namespace.
- *
- * \class std::exception
- * \brief Standard generic exception.
- *
- * \class std::invalid_argument
- * \brief Standard invalid argument exception.
- *
- * \class std::istream
- * \brief Standard character input stream.
- *
- * \class std::istream_iterator
- * \brief Standard character input stream iterator.
- *
- * \class std::list
- * \brief Standard list container.
- *
- * \class std::map
- * \brief Standard map container.
- *
- * \class std::multimap
- * \brief Standard multimap container.
- *
- * \class std::ostream
- * \brief Standard character output stream.
- *
- * \class std::string
- * \brief Standard character string.
- *
- * \namespace xspider
- * \brief XSpider Platform namespace.
+#include "abnfm.h"
+
+using namespace std;
+using namespace xspider;
+
+/*
+ * abnf_rule implementation
  */
+
+abnf_rule::abnf_rule(const abnf_ruleset& r_set):
+_r_set(r_set)
+{
+}
+
+const abnf_ruleset& abnf_rule::ruleset(void) const
+{
+	return _r_set;
+}
+
+/*
+ * abnf_rule_ri implementation
+ */
+
+void abnf_rule_ri::clear()
+{
+	clear_impl();
+	
+	_is = NULL;
+	_seg_vect.clear();
+}
+
+void abnf_rule_ri::read(istream& is)
+{
+	stream_update(is);
+	
+	abnf_matcher* m = matcher_new();
+	if (m->match(is))
+		m->commit();
+	else
+		is.seekg(m->stream_beg());
+	delete m;
+}
+
+size_t abnf_rule_ri::read_count(void) const
+{
+	return _seg_vect.size();
+}
+
+void abnf_rule_ri::write(size_t n, ostream& os) const
+{
+	if (_is not_eq NULL and n >= 0 and n < _seg_vect.size())
+		_seg_vect[n].write(*_is, os);
+}
