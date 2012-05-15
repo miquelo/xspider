@@ -31,141 +31,9 @@
 #include <map>
 #include <string>
 
-namespace xspider {
+#include "abnf.h"
 
-/*!
- * \brief Portable port definition.
- */
-class port_t
-{
-	public:
-	
-	/*!
-	 * \brief Port <tt>0</tt>.
-	 */
-	port_t(void)
-	{
-		_assign_ulong(0l);
-	}
-	
-	/*!
-	 * \brief Port from initial value of largest integral unsigned type.
-	 *
-	 * \param val
-	 *			Initial value.
-	 */
-	port_t(unsigned long val)
-	{
-		_assign_ulong(val);
-	}
-	
-	/*!
-	 * \brief Port from initial port value.
-	 *
-	 * \param p
-	 *			Initial port value.
-	 */
-	port_t(const port_t& p)
-	{
-		_assign_port(p);
-	}
-	
-	/*!
-	 * \brief Assignment from another port value.
-	 *
-	 * \param p
-	 *			Port value to be assigned.
-	 *
-	 * \return
-	 *			The port itself.
-	 */
-	port_t& operator = (const port_t& p)
-	{
-		return _assign_port(p);
-	}
-	
-	/*!
-	 * \brief Compare whether this port is equal than the given port.
-	 *
-	 * \param p
-	 *			The port to be compared with this port.
-	 *
-	 * \retval true
-	 *			If two ports are equal;
-	 * \retval false
-	 *			otherwise.
-	 */
-	bool operator == (const port_t& p)
-	{
-		for (size_t i = 0; i < _size; ++i)
-			if (_b[i] not_eq p._b[i])
-				return false;
-		return true;
-	}
-	
-	/*!
-	 * \brief Compare whether this port is not equal than the given port.
-	 *
-	 * \param p
-	 *			The port to be compared with this port.
-	 *
-	 * \retval true
-	 *			If two ports are not equal;
-	 * \retval false
-	 *			otherwise.
-	 */
-	bool operator not_eq (const port_t& p)
-	{
-		for (size_t i = 0; i < _size; ++i)
-			if (_b[i] not_eq p._b[i])
-				return true;
-		return false;
-	}
-	
-	/*!
-	 * \brief Compare whether this port is less than the given port.
-	 *
-	 * \param p
-	 *			The port to be compared with this port.
-	 *
-	 * \retval true
-	 *			If this port is less than the given port;
-	 * \retval false
-	 *			otherwise.
-	 */
-	bool operator < (const port_t& p)
-	{
-		for (size_t i = _size - 1; i >= 0; --i)
-		{
-			if (_b[i] < p._b[i])
-				return true;
-			else if (_b[i] > p._b[i])
-				return false;
-		}
-		return false;
-	}
-	
-	private:
-	
-	static const size_t _size = 4;
-	unsigned char _b[_size];
-	
-	port_t& _assign_ulong(unsigned long val)
-	{
-		for (size_t i = 0; i < _size; ++i)
-		{
-			_b[i] = val % 256;
-			val = val >> 8;
-		}
-		return *this;
-	}
-	
-	port_t& _assign_port(const port_t& p)
-	{
-		for (size_t i = 0; i < _size; ++i)
-			_b[i] = p._b[i];
-	}
-};
+namespace xspider {
 
 /*!
  * \brief Represents an Uniform Resource Identifier (URI).
@@ -175,12 +43,9 @@ class uri
 	public:
 	
 	/*!
-	 * \brief Constructs an URI with a given specification.
-	 *
-	 * \param spec
-	 *			URI specification.
+	 * \brief Constructs an empty URI.
 	 */
-	uri(const std::string& spec);
+	uri(void);
 	
 	/*!
 	 * \brief Determines whether this URI is relative or not.
@@ -190,7 +55,10 @@ class uri
 	 * \retval false
 	 *			otherwise.
 	 */
-	bool relative(void) const;
+	bool relative(void) const
+	{
+		return _scheme.empty();
+	}
 	
 	/*!
 	 * \brief Scheme component of this URI.
@@ -198,7 +66,10 @@ class uri
 	 * \return
 	 *			The scheme of this URI. Empty if it doesn't have any.
 	 */
-	const std::string& scheme(void) const;
+	const std::string& scheme(void) const
+	{
+		return _scheme;
+	}
 	
 	/*!
 	 * \brief User info component of this URI.
@@ -206,7 +77,10 @@ class uri
 	 * \return
 	 *			The user info of this URI. Empty if it doesn't have any.
 	 */
-	const std::string& userinfo(void) const;
+	const std::string& userinfo(void) const
+	{
+		return _userinfo;
+	}
 	
 	/*!
 	 * \brief Host component of this URI.
@@ -214,7 +88,10 @@ class uri
 	 * \return
 	 *			The host of this URI. Empty if it doesn't have any.
 	 */
-	const std::string& host(void) const;
+	const std::string& host(void) const
+	{
+		return _host;
+	}
 	
 	/*!
 	 * \brief Fragment component of this URI.
@@ -222,7 +99,10 @@ class uri
 	 * \return
 	 *			The fragment of this URI. Empty if it doesn't have any.
 	 */
-	const std::string& fragment(void) const;
+	const std::string& fragment(void) const
+	{
+		return _fragment;
+	}
 	
 	/*!
 	 * \brief Port component of this URI.
@@ -230,7 +110,10 @@ class uri
 	 * \return
 	 *			The port of this URI. Zero if it doesn't have any.
 	 */
-	const port_t& port(void) const;
+	unsigned long port(void) const
+	{
+		return _port;
+	}
 	
 	/*!
 	 * \brief Path component of this URI.
@@ -238,7 +121,10 @@ class uri
 	 * \return
 	 *			The path of this URI. Empty if it doesn't have any.
 	 */
-	const std::list<std::string>& path(void) const;
+	const std::list<std::string>& path(void) const
+	{
+		return _path;
+	}
 	
 	/*!
 	 * \brief Query component of this URI.
@@ -246,18 +132,51 @@ class uri
 	 * \return
 	 *			The query of this URI. Empty if it doesn't have any.
 	 */
-	const std::multimap<std::string, std::string>& query(void) const;
+	const std::multimap<std::string, std::string>& query(void) const
+	{
+		return _query;
+	}
 	
 	private:
 	
+	static abnf_ruleset _rset;
 	std::string _scheme;
 	std::string _userinfo;
 	std::string _host;
 	std::string _fragment;
-	port_t _port;
+	unsigned long _port;
 	std::list<std::string> _path;
 	std::multimap<std::string, std::string> _query;
+	
+	friend std::istream& operator >> (std::istream& is, uri& u);
+	friend std::ostream& operator << (std::ostream& os, const uri& u);
 };
+
+/*!
+ * \brief Parse an URI from a character stream.
+ *
+ * \param is
+ *			Character stream which contains an URI to be parsed.
+ * \param u
+ *			Target URI to receive the parsing results.
+ *
+ * \return
+ *			The source character stream.
+ */
+std::istream& operator >> (std::istream& is, uri& u);
+
+/*!
+ * \brief Put an URI representation to a character stream.
+ *
+ * \param os
+ *			Character stream to put the URI representation.
+ * \param u
+ *			Source URI to be represented.
+ *
+ * \return
+ *			The target character stream.
+ */
+std::ostream& operator << (std::ostream& os, const uri& u);
 
 } // namespace xspider
 
