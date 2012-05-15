@@ -196,10 +196,10 @@ class reference
 	/*!
 	 * \brief Checks if this reference is an empty reference.
 	 *
-	 * \retval
-	 *			true if this is not an empty reference;
-	 * \retval
-	 *			false otherwise.
+	 * \retval true
+	 *			if this is not an empty reference;
+	 * \retval false
+	 *			otherwise.
 	 */
 	operator bool (void)
 	{
