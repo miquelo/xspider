@@ -377,7 +377,7 @@ class abnf_ruleset
 };
 
 /*!
- * \brief ABNF Rule.
+ * \brief ABNF rule.
  */
 class abnf_rule
 {
