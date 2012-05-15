@@ -18,25 +18,26 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include <cstring>
+
 #include "abnfm.h"
 
 namespace xspider {
 
 /*
- * Matcher for range alternate rule.
+ * Matcher for characters alternate rule.
  */
-class abnf_matcher_ralt:
+class abnf_matcher_altch:
 public abnf_matcher
 {
 	public:
 	
 	/*
-	 * Initialized range alternate matcher.
+	 * Initialized characters alternate matcher.
 	 */
-	abnf_matcher_ralt(abnf_rule_ri& r, const int& ci, const int& ce):
+	abnf_matcher_altch(abnf_rule_ri& r, const char*& altch):
 	abnf_matcher(r),
-	_ci(ci),
-	_ce(ce)
+	_altch(altch)
 	{
 	}
 	
@@ -48,20 +49,19 @@ public abnf_matcher
 	void commit_impl(void);
 	
 	/*
-	 * Matches if, next character is in characters range.
+	 * Matches if next character is in alternative characters string.
 	 */
 	bool match_impl(std::istream& is);
 			
 	private:
 	
-	const int& _ci;
-	const int& _ce;
+	const char*& _altch;
 };
 
 /*
- * Range alternate rule.
+ * Characters alternate rule.
  */
-class abnf_rule_ralt:
+class abnf_rule_altch:
 public abnf_rule_ri
 {
 	public:
@@ -69,17 +69,16 @@ public abnf_rule_ri
 	/*
 	 * Initialized range alternate rule.
 	 */
-	abnf_rule_ralt(const abnf_ruleset& r_set, int ci, int ce):
+	abnf_rule_altch(const abnf_ruleset& r_set, const char* altch):
 	abnf_rule_ri(r_set),
-	_ci(ci),
-	_ce(std::max(ci, ce))
+	_altch(altch)
 	{
 	}
 	
 	protected:
 	
 	/*
-	 * Creates a range alternate matcher.
+	 * Creates a characters alternate matcher.
 	 */
 	abnf_matcher* matcher_new(void);
 	
@@ -101,7 +100,7 @@ public abnf_rule_ri
 			
 	private:
 	
-	const int _ci, _ce;
+	const char* _altch;
 };
 
 } // namespace xspider
@@ -113,44 +112,53 @@ using namespace xspider;
  * abnf_ruleset implementation
  */
  
-abnf_rule& abnf_ruleset::alternat(int ci, int ce)
+abnf_rule& abnf_ruleset::alternat(const char* altch)
 {
-	return **_r_set.insert(new abnf_rule_ralt(*this, ci, ce)).first;
+	return **_r_set.insert(new abnf_rule_altch(*this, altch)).first;
 }
 
 /*
- * abnf_matcher_ralt implementation
+ * abnf_matcher_altch implementation
  */
  
-void abnf_matcher_ralt::commit_impl(void)
+void abnf_matcher_altch::commit_impl(void)
 {
 }
 
-bool abnf_matcher_ralt::match_impl(istream& is)
+bool abnf_matcher_altch::match_impl(istream& is)
 {
+	if (is.bad())
+		return false;
+	
 	char c;
-	return is.good() and (is.get(c), c) >= _ci and c <= _ce;
+	is.get(c);
+	size_t len = strlen(_altch);
+	
+	for (int i = 0; i < len; ++i)
+		if (_altch[i] == c)
+			return true;
+	return false;
 }
 
 /*
- * abnf_rule_ralt implementation
+ * abnf_rule_altch implementation
  */
 
-abnf_matcher* abnf_rule_ralt::matcher_new(void)
+abnf_matcher* abnf_rule_altch::matcher_new(void)
 {
-	return new abnf_matcher_ralt(*this, _ci, _ce);
+	return new abnf_matcher_altch(*this, _altch);
 }
 
-void abnf_rule_ralt::clear_impl(void)
-{
-}
-
-void abnf_rule_ralt::stream_update_impl(std::istream& is)
+void abnf_rule_altch::clear_impl(void)
 {
 }
 
-abnf_rule_ri* abnf_rule_ralt::dupl_impl(const abnf_ruleset& r_set,
+void abnf_rule_altch::stream_update_impl(std::istream& is)
+{
+}
+
+abnf_rule_ri* abnf_rule_altch::dupl_impl(const abnf_ruleset& r_set,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_ralt(r_set, _ci, _ce);
+	return new abnf_rule_altch(r_set, _altch);
 }

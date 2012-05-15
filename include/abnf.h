@@ -43,12 +43,21 @@ class abnf_ruleset
 	public:
 	
 	/*!
+	 * \brief Ruleset with core ABNF rules as defined in RFC 5234.
+	 *
+	 * \return
+	 * 			A reference to the core ruleset.
+	 */
+	static const abnf_ruleset& core_ruleset(void);
+	
+	/*!
 	 * \brief Creates an empty rule set.
 	 */
 	abnf_ruleset(void);
 	
 	/*!
-	 * \brief Copies whole rules of the given rule set to this rule set.
+	 * \brief Copies the given rule set by including its rules and definitions
+	 * to this empty rule set.
 	 *
 	 * \param r_set
 	 *			A ruleset to be copied.
@@ -59,6 +68,28 @@ class abnf_ruleset
 	 * \brief Releases this rule set.
 	 */
 	~abnf_ruleset(void);
+	
+	/*!
+	 * \brief Includes to this rule set those rules and definitions of the
+	 * given rule set.
+	 *
+	 * \param r_set
+	 *			Included rule set.
+	 */
+	void include(const abnf_ruleset& r_set);
+	
+	/*!
+	 * \brief Indicates if a rule was defined with the given name.
+	 *
+	 * \param r_name
+	 *			Case insensitive name of a rule.
+	 *
+	 * \retval true
+	 *			if a rule was defined with \p r_name;
+	 * \retval false
+	 *			otherwise.
+	 */
+	bool defined(const char* r_name) const;
 	
 	/*!
 	 * \brief Get the named rule from this rule set.
@@ -93,6 +124,16 @@ class abnf_ruleset
 	 *			If \p r is not created by this rule set.
 	 */
 	abnf_rule& define(const char* r_name, abnf_rule& r);
+	
+	/*!
+	 * \brief Creates an special rule for an <i>end of file</i> reaching.
+	 *
+	 * Matches when the end of stream has been reached.
+	 *
+	 * \return
+	 *			The created <i>EOF</i> rule.
+	 */
+	abnf_rule& eof(void);
 	
 	/*!
 	 * \brief Creates a terminal rule with a single character for this rule
@@ -211,6 +252,30 @@ class abnf_ruleset
 	abnf_rule& alternat(int ci, int ce);
 	
 	/*!
+	 * \brief Creates a convenient rule consisting in a multiple alternative
+	 * characters.
+	 *
+	 * It is the same as a multiple consecutive alternatives of character
+	 * terminals.
+	 *
+	 * For example,
+	 *
+	 * \code
+	 * abnf_ruleset rset;
+	 * abnf_rule& r_foo = rset.alternat("%&$");
+	 * \endcode
+	 *
+	 * creates the <tt>"%" / "&" / "$"</tt> rule.
+	 *
+	 * \param altch
+	 *			Alternative characters.
+	 *
+	 * \return
+	 *			The created character alternatives rule.
+	 */
+	abnf_rule& alternat(const char* altch);
+	
+	/*!
 	 * \brief Creates an alternative rule of two rules.
 	 *
 	 * It can be used to create an alternative list of more than two rules
@@ -305,6 +370,7 @@ class abnf_ruleset
 	
 	private:
 	
+	static abnf_ruleset _core_rset;
 	abnf_rule* _empty_r;
 	std::set<abnf_rule*> _r_set;
 	std::map<std::string, abnf_rule*> _r_map;

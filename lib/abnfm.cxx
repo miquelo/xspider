@@ -30,7 +30,7 @@ abnf_matcher::~abnf_matcher(void)
 {
 }
 
-bool abnf_matcher::availability_test(void) const
+bool abnf_matcher::available(void) const
 {
 	return false;
 }

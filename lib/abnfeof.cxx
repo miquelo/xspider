@@ -23,20 +23,18 @@
 namespace xspider {
 
 /*
- * Matcher for range alternate rule.
+ * Matcher for EOF rule.
  */
-class abnf_matcher_ralt:
+class abnf_matcher_eof:
 public abnf_matcher
 {
 	public:
 	
 	/*
-	 * Initialized range alternate matcher.
+	 * Initialized EOF matcher.
 	 */
-	abnf_matcher_ralt(abnf_rule_ri& r, const int& ci, const int& ce):
-	abnf_matcher(r),
-	_ci(ci),
-	_ce(ce)
+	abnf_matcher_eof(abnf_rule_ri& r):
+	abnf_matcher(r)
 	{
 	}
 	
@@ -48,38 +46,31 @@ public abnf_matcher
 	void commit_impl(void);
 	
 	/*
-	 * Matches if, next character is in characters range.
+	 * Matches if EOF has been reached.
 	 */
 	bool match_impl(std::istream& is);
-			
-	private:
-	
-	const int& _ci;
-	const int& _ce;
 };
 
 /*
- * Range alternate rule.
+ * Characters alternate rule.
  */
-class abnf_rule_ralt:
+class abnf_rule_eof:
 public abnf_rule_ri
 {
 	public:
 	
 	/*
-	 * Initialized range alternate rule.
+	 * Initialized EOF rule.
 	 */
-	abnf_rule_ralt(const abnf_ruleset& r_set, int ci, int ce):
-	abnf_rule_ri(r_set),
-	_ci(ci),
-	_ce(std::max(ci, ce))
+	abnf_rule_eof(const abnf_ruleset& r_set):
+	abnf_rule_ri(r_set)
 	{
 	}
 	
 	protected:
 	
 	/*
-	 * Creates a range alternate matcher.
+	 * Creates an EOF matcher.
 	 */
 	abnf_matcher* matcher_new(void);
 	
@@ -98,10 +89,6 @@ public abnf_rule_ri
 	 */
 	abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const;
-			
-	private:
-	
-	const int _ci, _ce;
 };
 
 } // namespace xspider
@@ -113,44 +100,45 @@ using namespace xspider;
  * abnf_ruleset implementation
  */
  
-abnf_rule& abnf_ruleset::alternat(int ci, int ce)
+abnf_rule& abnf_ruleset::eof(void)
 {
-	return **_r_set.insert(new abnf_rule_ralt(*this, ci, ce)).first;
+	return **_r_set.insert(new abnf_rule_eof(*this)).first;
 }
 
 /*
- * abnf_matcher_ralt implementation
+ * abnf_matcher_eof implementation
  */
  
-void abnf_matcher_ralt::commit_impl(void)
+void abnf_matcher_eof::commit_impl(void)
 {
 }
 
-bool abnf_matcher_ralt::match_impl(istream& is)
+bool abnf_matcher_eof::match_impl(istream& is)
 {
-	char c;
-	return is.good() and (is.get(c), c) >= _ci and c <= _ce;
+	bool eof = (is.peek(), is.eof());
+	is.clear();
+	return eof;
 }
 
 /*
- * abnf_rule_ralt implementation
+ * abnf_rule_eof implementation
  */
 
-abnf_matcher* abnf_rule_ralt::matcher_new(void)
+abnf_matcher* abnf_rule_eof::matcher_new(void)
 {
-	return new abnf_matcher_ralt(*this, _ci, _ce);
+	return new abnf_matcher_eof(*this);
 }
 
-void abnf_rule_ralt::clear_impl(void)
-{
-}
-
-void abnf_rule_ralt::stream_update_impl(std::istream& is)
+void abnf_rule_eof::clear_impl(void)
 {
 }
 
-abnf_rule_ri* abnf_rule_ralt::dupl_impl(const abnf_ruleset& r_set,
+void abnf_rule_eof::stream_update_impl(std::istream& is)
+{
+}
+
+abnf_rule_ri* abnf_rule_eof::dupl_impl(const abnf_ruleset& r_set,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_ralt(r_set, _ci, _ce);
+	return new abnf_rule_eof(r_set);
 }

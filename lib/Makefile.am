@@ -11,11 +11,14 @@ libxspiderplat_la_LDFLAGS = \
 	
 libxspiderplat_la_SOURCES = \
 	abnfalt.cxx \
+	abnfaltch.cxx \
 	abnfcon.cxx \
+	abnfeof.cxx \
 	abnfm.cxx \
 	abnfr.cxx \
 	abnfralt.cxx \
 	abnfrep.cxx \
+	abnfrscore.cxx \
 	abnfrset.cxx \
 	abnfterch.cxx \
 	abnfterfn.cxx \

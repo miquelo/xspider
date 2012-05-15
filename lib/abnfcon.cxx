@@ -37,6 +37,7 @@ public abnf_matcher
 	 */
 	abnf_matcher_con(abnf_rule_ri& r, abnf_rule_ri& rl, abnf_rule_ri& rr):
 	abnf_matcher(r),
+	_l_test(true),
 	_rr(rr),
 	_ml(rl.matcher_new()),
 	_mr(rr.matcher_new())
@@ -48,12 +49,12 @@ public abnf_matcher
 	 */
 	~abnf_matcher_con(void);
 	
-	protected:
-	
 	/*
 	 * Available if, and only if any of two matchers is available.
 	 */
-	bool availability_test(void) const;
+	bool available(void) const;
+	
+	protected:
 	
 	/*
 	 * Commit left and right matchers.
@@ -67,6 +68,7 @@ public abnf_matcher
 			
 	private:
 	
+	bool _l_test;
 	abnf_rule_ri& _rr;
 	abnf_matcher* _ml;
 	abnf_matcher* _mr;
@@ -149,7 +151,7 @@ abnf_matcher_con::~abnf_matcher_con(void)
 	delete _mr;
 }
 
-bool abnf_matcher_con::availability_test(void) const
+bool abnf_matcher_con::available(void) const
 {
 	return _ml->available() or _mr->available();
 }
@@ -162,21 +164,25 @@ void abnf_matcher_con::commit_impl(void)
 
 bool abnf_matcher_con::match_impl(istream& is)
 {
-	bool matched = false;
+	bool l_matched = false;
+	bool r_matched = false;
 	
 	do
 	{
+		is.clear();
 		is.seekg(stream_beg());
-		
-		if (_ml->available() and not _mr->available())
-			_mr = (_ml->mismatch(), delete _mr, _rr.matcher_new());
-		
-		if (_ml->match(is))
-			matched = (_mr->mismatch(), _mr->match(is));
+			
+		if (l_matched = _l_test ? _ml->match(is) : true)
+		{
+			is.seekg(_ml->stream_end());
+			
+			if (_l_test = not (r_matched = _mr->match(is)))
+				_mr = (delete _mr, _rr.matcher_new());
+		}
 	}
-	while (not matched and _ml->available());
+	while (l_matched and not r_matched);
 	
-	return matched;
+	return l_matched and r_matched;
 }
 
 /*

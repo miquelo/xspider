@@ -98,6 +98,8 @@ using namespace xspider;
 /*
  * abnf_ruleset implementation
  */
+ 
+abnf_ruleset abnf_ruleset::_core_rset;
 
 abnf_ruleset::abnf_ruleset(void):
 _empty_r(new abnf_rule_empty(*this))
@@ -106,6 +108,18 @@ _empty_r(new abnf_rule_empty(*this))
 
 abnf_ruleset::abnf_ruleset(const abnf_ruleset& r_set):
 _empty_r(new abnf_rule_empty(*this))
+{
+	include(r_set);
+}
+
+abnf_ruleset::~abnf_ruleset(void)
+{
+	set<abnf_rule*>::const_iterator it = _r_set.begin();
+	while (it not_eq _r_set.end())
+		delete *it++;
+}
+
+void abnf_ruleset::include(const abnf_ruleset& r_set)
 {
 	std::map<const abnf_rule*, abnf_rule_ri*> d_map;
 	
@@ -125,11 +139,14 @@ _empty_r(new abnf_rule_empty(*this))
 		_r_map[m_it->first] = d_map[m_it++->second];
 }
 
-abnf_ruleset::~abnf_ruleset(void)
+bool abnf_ruleset::defined(const char* r_name) const
 {
-	set<abnf_rule*>::const_iterator it = _r_set.begin();
-	while (it not_eq _r_set.end())
-		delete *it++;
+	string str = r_name;
+	transform(str.begin(), str.end(), str.begin(), ::tolower);
+	map<string, abnf_rule*>::const_iterator it = _r_map.find(str);
+	
+	// If found, defined. If not, undefined
+	return it not_eq _r_map.end();
 }
 
 abnf_rule& abnf_ruleset::get(const char* r_name) const

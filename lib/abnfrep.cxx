@@ -42,8 +42,7 @@ public abnf_matcher
 	_min(r_min),
 	_max(r_max),
 	_ru(ru),
-	_count(_min),
-	_last_pos(-1l)
+	_count(_min - 1)
 	{
 	}
 	
@@ -52,13 +51,13 @@ public abnf_matcher
 	 */
 	~abnf_matcher_rep(void);
 	
-	protected:
-	
 	/*
 	 * Available if, and only if any matcher is available or maximum is not
 	 * reached.
 	 */
-	bool availability_test(void) const;
+	bool available(void) const;
+	
+	protected:
 	
 	/*
 	 * Commit stored matchers.
@@ -75,8 +74,20 @@ public abnf_matcher
 	const int _min, _max;
 	abnf_rule_ri& _ru;
 	int _count;
-	std::streampos _last_pos;
 	std::vector<abnf_matcher*> _m_vect;
+	
+	/*
+	 * Last matching position.
+	 *
+	 * Precondition:
+	 *		matcher vector is not empty
+	 */
+	const std::streampos& _last_pos(void) const
+	{
+		if (_m_vect.size() > 1)
+			return (*(_m_vect.rbegin() + 1))->stream_end();
+		return stream_beg();
+	}
 };
 
 /*
@@ -161,9 +172,13 @@ abnf_matcher_rep::~abnf_matcher_rep(void)
 		delete *it++;
 }
 
-bool abnf_matcher_rep::availability_test(void) const
+bool abnf_matcher_rep::available(void) const
 {
-	return _count not_eq -1;
+	vector<abnf_matcher*>::const_iterator it = _m_vect.begin();
+	while (it not_eq _m_vect.end())
+		if ((*it++)->available())
+			return true;
+	return _m_vect.size() < _max;
 }
 
 void abnf_matcher_rep::commit_impl(void)
@@ -175,23 +190,24 @@ void abnf_matcher_rep::commit_impl(void)
 
 bool abnf_matcher_rep::match_impl(istream& is)
 {
-	bool mismatched = false;
-	bool matched = _count == 0;
+	if (_count < _max)
+	{
+		++_count;
+		if (_count == 0)
+			return true;
+		_m_vect.push_back(_ru.matcher_new());
+	}
 	
-	if (_last_pos == -1l)
-		_last_pos = stream_beg();
+	bool mismatched = false;
+	bool matched = false;
 	
 	while (not mismatched and not matched)
 	{
-		if (_m_vect.empty())
-			_m_vect.push_back(_ru.matcher_new());
-			
-		is.seekg(_last_pos);
+		is.clear();
+		is.seekg(_last_pos());
 		
 		if (_m_vect.back()->match(is))
 		{
-			_last_pos = _m_vect.back()->stream_end();
-			
 			if (_m_vect.size() == _count)
 				matched = true;
 			else
@@ -201,24 +217,10 @@ bool abnf_matcher_rep::match_impl(istream& is)
 		{
 			delete _m_vect.back();
 			_m_vect.pop_back();
-			_count = max(_count - 1, _min);
 			
-			if (_m_vect.empty())
+			if (--_count == 0)
 				mismatched = true;
-			else
-			{
-				_m_vect.back()->mismatch();
-				_last_pos = _m_vect.back()->stream_beg();
-			}
 		}
-	}
-	
-	if (_count == _max)
-		_count == -1;
-	else
-	{
-		++_count;
-		_m_vect.push_back(_ru.matcher_new());
 	}
 	return matched;
 }

@@ -21,8 +21,6 @@
 #ifndef ABNFM_H
 #define ABNFM_H
 
-#include <cassert>
-
 #include "abnfr.h"
 
 namespace xspider {
@@ -36,12 +34,9 @@ class abnf_matcher
 	
 	/*
 	 * Initialized generic matcher.
-	 *
-	 * Not matched and available.
 	 */
 	abnf_matcher(abnf_rule_ri& r):
 	_r(r),
-	_matched(false),
 	_avail(true),
 	_beg(0l),
 	_end(0l)
@@ -52,14 +47,6 @@ class abnf_matcher
 	 * Release matcher resources.
 	 */
 	virtual ~abnf_matcher(void);
-	
-	/*
-	 * Public access to availability flag.
-	 */
-	const bool& available(void) const
-	{
-		return _avail;
-	}
 	
 	/*
 	 * Begin of mathing stream.
@@ -78,20 +65,12 @@ class abnf_matcher
 	}
 	
 	/*
-	 * Clear match flag.
-	 */
-	void mismatch(void)
-	{
-		_matched = false;
-	}
-	
-	/*
 	 * Add begin-end segment to this matcher rule if it was matched and it does
 	 * not determine an empty segment.
 	 */
 	void commit(void)
 	{
-		if (_matched and _end > _beg)
+		if (_end > _beg)
 		{
 			_r.segment_add(_beg, _end);
 			commit_impl();
@@ -101,49 +80,35 @@ class abnf_matcher
 	/*
 	 * Test matching from current position of the given stream.
 	 *
-	 * If this matcher has already matched, matching test matches directly
-	 * and state is not changed.
-	 *
-	 * If required size < 0, it mismatches directly.
-	 *
 	 * It uses match_impl to determine if it matches and store begin and end
 	 * position.
 	 *
 	 * Returns true if matches; false otherwise.
 	 *
-	 * Precondition:
-	 *		match state flag = true -> is.tellg() = begin position
-	 *
 	 * Postcondition:
-	 *		required size is updated, 1l if mismatched
 	 *		begin position is is.tellg() before matching test
 	 *		end position is is.tellg() after matching test
-	 *		match state flag updated accordingly to matching test
 	 */
 	bool match(std::istream& is)
 	{
-		assert(not _matched or is.tellg() == _beg);
-			
-		if (_matched)
-			is.seekg(_end);
-		else if (_avail)
+		if (_avail)
 		{
 			_beg = is.tellg();
-			_matched = match_impl(is);
+			bool matched = match_impl(is);
 			_end = is.tellg();
+			_avail = matched and available();
+			
+			return matched;
 		}
-		_avail = _matched and availability_test();
-		
-		return _matched;
+		return false;
 	}
 	
-	protected:
-	
 	/*
-	 * Callback called after this matcher has been created in order to
-	 * determine its availability.
+	 * Availability test.
 	 */
-	virtual bool availability_test(void) const;
+	virtual bool available(void) const;
+	
+	protected:
 	
 	/*
 	 * Commit children segments, if it has any.
@@ -160,7 +125,7 @@ class abnf_matcher
 	private:
 	
 	abnf_rule_ri& _r;
-	bool _matched, _avail;
+	bool _avail;
 	std::streampos _beg, _end;
 };
 
