@@ -48,6 +48,14 @@ class uri
 	uri(void);
 	
 	/*!
+	 * \brief Constructs an URI by parsing it from a given string.
+	 *
+	 * \param s
+	 *			URI representation to be parsed.
+	 */
+	uri(const std::string& s);
+	
+	/*!
 	 * \brief Determines whether this URI is relative or not.
 	 *
 	 * \retval true

@@ -40,6 +40,12 @@ _port(DEFAULT_PORT)
 {
 }
 
+uri::uri(const string& s)
+{
+	stringstream ss(s);
+	ss >> *this;
+} 
+
 istream& xspider::operator >> (istream& is, uri& u)
 {
 	u._scheme.clear();
