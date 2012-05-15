@@ -69,8 +69,8 @@ public abnf_rule_ri
 	/*
 	 * Initialized range alternate rule.
 	 */
-	abnf_rule_altch(const abnf_ruleset& r_set, const char* altch):
-	abnf_rule_ri(r_set),
+	abnf_rule_altch(const abnf_ruleset& rset, const char* altch):
+	abnf_rule_ri(rset),
 	_altch(altch)
 	{
 	}
@@ -95,7 +95,7 @@ public abnf_rule_ri
 	/*
 	 * Duplicate operation implementation.
 	 */
-	abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
+	abnf_rule_ri* dupl_impl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const;
 			
 	private:
@@ -157,8 +157,8 @@ void abnf_rule_altch::stream_update_impl(std::istream& is)
 {
 }
 
-abnf_rule_ri* abnf_rule_altch::dupl_impl(const abnf_ruleset& r_set,
+abnf_rule_ri* abnf_rule_altch::dupl_impl(const abnf_ruleset& rset,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_altch(r_set, _altch);
+	return new abnf_rule_altch(rset, _altch);
 }

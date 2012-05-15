@@ -99,8 +99,8 @@ public abnf_rule
 	/*
 	 * Initialized rule, with its owner, empty stream and empty segment vector.
 	 */
-	abnf_rule_ri(const abnf_ruleset& r_set):
-	abnf_rule(r_set),
+	abnf_rule_ri(const abnf_ruleset& rset):
+	abnf_rule(rset),
 	_is(NULL)
 	{
 	}
@@ -174,14 +174,14 @@ public abnf_rule
 	 * Postcondition:
 	 *		d_map contains an entry with this as key and duplicated as value
 	 */
-	abnf_rule_ri* dupl(const abnf_ruleset& r_set,
+	abnf_rule_ri* dupl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 	{
 		std::map<const abnf_rule*, abnf_rule_ri*>::const_iterator it =
 				d_map.find(this);
 		if (it not_eq d_map.end())
 			return it->second;
-		return d_map[this] = dupl_impl(r_set, d_map);
+		return d_map[this] = dupl_impl(rset, d_map);
 	}
 	
 	/*
@@ -204,7 +204,7 @@ public abnf_rule
 	/*
 	 * Call dupl recursively on to children rules.
 	 */
-	virtual abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
+	virtual abnf_rule_ri* dupl_impl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const = 0;
 			
 	private:
@@ -217,9 +217,9 @@ public abnf_rule
  * Throws a detailed std::invalid_argument exception if the owner rule set of
  * the given rule is not the same as the given rule set.
  */
-inline void owner_test(const abnf_ruleset& r_set, const abnf_rule& r)
+inline void owner_test(const abnf_ruleset& rset, const abnf_rule& r)
 {
-	if (&r_set not_eq &r.ruleset())
+	if (&rset not_eq &r.ruleset())
 		throw std::invalid_argument("rule from different rule set");
 }
 

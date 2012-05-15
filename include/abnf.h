@@ -59,10 +59,10 @@ class abnf_ruleset
 	 * \brief Copies the given rule set by including its rules and definitions
 	 * to this empty rule set.
 	 *
-	 * \param r_set
+	 * \param rset
 	 *			A ruleset to be copied.
 	 */
-	abnf_ruleset(const abnf_ruleset& r_set);
+	abnf_ruleset(const abnf_ruleset& rset);
 	
 	/*!
 	 * \brief Releases this rule set.
@@ -73,10 +73,10 @@ class abnf_ruleset
 	 * \brief Includes to this rule set those rules and definitions of the
 	 * given rule set.
 	 *
-	 * \param r_set
+	 * \param rset
 	 *			Included rule set.
 	 */
-	void include(const abnf_ruleset& r_set);
+	void include(const abnf_ruleset& rset);
 	
 	/*!
 	 * \brief Indicates if a rule was defined with the given name.
@@ -126,12 +126,12 @@ class abnf_ruleset
 	abnf_rule& define(const char* r_name, abnf_rule& r);
 	
 	/*!
-	 * \brief Creates an special rule for an <i>end of file</i> reaching.
+	 * \brief Creates an special rule for an EOF reaching.
 	 *
 	 * Matches when the end of stream has been reached.
 	 *
 	 * \return
-	 *			The created <i>EOF</i> rule.
+	 *			The created EOF rule.
 	 */
 	abnf_rule& eof(void);
 	
@@ -434,14 +434,14 @@ class abnf_rule
 	/*!
 	 * \brief Creates an owned rule.
 	 *
-	 * \param r_set
+	 * \param rset
 	 *			Owner ruleset.
 	 */
-	abnf_rule(const abnf_ruleset& r_set);
+	abnf_rule(const abnf_ruleset& rset);
 	
 	private:
 	
-	const abnf_ruleset& _r_set;
+	const abnf_ruleset& _rset;
 };
 
 } // namespace xspider

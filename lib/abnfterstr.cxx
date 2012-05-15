@@ -68,8 +68,8 @@ public abnf_rule_ri
 	/*
 	 * Initialized rule.
 	 */
-	abnf_rule_terstr(const abnf_ruleset& r_set, const char* ter_str):
-	abnf_rule_ri(r_set),
+	abnf_rule_terstr(const abnf_ruleset& rset, const char* ter_str):
+	abnf_rule_ri(rset),
 	_str(ter_str == NULL ? "" : ter_str)
 	{
 	}
@@ -94,7 +94,7 @@ public abnf_rule_ri
 	/*
 	 * Duplicate operation implementation.
 	 */
-	abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
+	abnf_rule_ri* dupl_impl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const;
 			
 	private:
@@ -154,8 +154,8 @@ void abnf_rule_terstr::stream_update_impl(std::istream& is)
 {
 }
 
-abnf_rule_ri* abnf_rule_terstr::dupl_impl(const abnf_ruleset& r_set,
+abnf_rule_ri* abnf_rule_terstr::dupl_impl(const abnf_ruleset& rset,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_terstr(r_set, _str.c_str());
+	return new abnf_rule_terstr(rset, _str.c_str());
 }

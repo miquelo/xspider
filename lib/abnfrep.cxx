@@ -101,9 +101,9 @@ public abnf_rule_ri
 	/*
 	 * Initialized repetition rule.
 	 */
-	abnf_rule_rep(const abnf_ruleset& r_set, int r_min, int r_max,
+	abnf_rule_rep(const abnf_ruleset& rset, int r_min, int r_max,
 			abnf_rule_ri& r):
-	abnf_rule_ri(r_set),
+	abnf_rule_ri(rset),
 	_min(std::max(0, r_min)),
 	_max(std::max(_min, r_max)),
 	_r(r)
@@ -130,7 +130,7 @@ public abnf_rule_ri
 	/*
 	 * Duplicate operation implementation.
 	 */
-	abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
+	abnf_rule_ri* dupl_impl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const;
 			
 	private:
@@ -244,8 +244,8 @@ void abnf_rule_rep::stream_update_impl(std::istream& is)
 	_r.stream_update(is);
 }
 
-abnf_rule_ri* abnf_rule_rep::dupl_impl(const abnf_ruleset& r_set,
+abnf_rule_ri* abnf_rule_rep::dupl_impl(const abnf_ruleset& rset,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_rep(r_set, _min, _max, _r);
+	return new abnf_rule_rep(rset, _min, _max, _r);
 }

@@ -17,9 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  */
-
-#include <climits>
-
+ 
 #include "abnfm.h"
 
 namespace xspider {
@@ -85,9 +83,8 @@ public abnf_rule_ri
 	/*
 	 * Initialized concatenation rule.
 	 */
-	abnf_rule_con(const abnf_ruleset& r_set, abnf_rule_ri& rl,
-			abnf_rule_ri& rr):
-	abnf_rule_ri(r_set),
+	abnf_rule_con(const abnf_ruleset& rset, abnf_rule_ri& rl, abnf_rule_ri& rr):
+	abnf_rule_ri(rset),
 	_rl(rl),
 	_rr(rr)
 	{
@@ -113,7 +110,7 @@ public abnf_rule_ri
 	/*
 	 * Duplicate operation implementation.
 	 */
-	abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
+	abnf_rule_ri* dupl_impl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const;
 			
 	private:
@@ -206,8 +203,8 @@ void abnf_rule_con::stream_update_impl(std::istream& is)
 	_rr.stream_update(is);
 }
 
-abnf_rule_ri* abnf_rule_con::dupl_impl(const abnf_ruleset& r_set,
+abnf_rule_ri* abnf_rule_con::dupl_impl(const abnf_ruleset& rset,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_con(r_set, _rl, _rr);
+	return new abnf_rule_con(rset, _rl, _rr);
 }

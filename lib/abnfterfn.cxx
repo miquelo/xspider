@@ -75,8 +75,8 @@ public abnf_rule_ri
 	/*
 	 * Initialized rule.
 	 */
-	abnf_rule_terfn(const abnf_ruleset& r_set, int (*ter_fn)(int)):
-	abnf_rule_ri(r_set),
+	abnf_rule_terfn(const abnf_ruleset& rset, int (*ter_fn)(int)):
+	abnf_rule_ri(rset),
 	_fn(ter_fn == NULL ? abnf_terfn_false : ter_fn)
 	{
 	}
@@ -101,7 +101,7 @@ public abnf_rule_ri
 	/*
 	 * Duplicate operation implementation.
 	 */
-	abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
+	abnf_rule_ri* dupl_impl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const;
 			
 	private:
@@ -159,8 +159,8 @@ void abnf_rule_terfn::stream_update_impl(std::istream& is)
 {
 }
 
-abnf_rule_ri* abnf_rule_terfn::dupl_impl(const abnf_ruleset& r_set,
+abnf_rule_ri* abnf_rule_terfn::dupl_impl(const abnf_ruleset& rset,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_terfn(r_set, _fn);
+	return new abnf_rule_terfn(rset, _fn);
 }

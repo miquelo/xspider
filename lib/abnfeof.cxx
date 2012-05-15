@@ -62,8 +62,8 @@ public abnf_rule_ri
 	/*
 	 * Initialized EOF rule.
 	 */
-	abnf_rule_eof(const abnf_ruleset& r_set):
-	abnf_rule_ri(r_set)
+	abnf_rule_eof(const abnf_ruleset& rset):
+	abnf_rule_ri(rset)
 	{
 	}
 	
@@ -87,7 +87,7 @@ public abnf_rule_ri
 	/*
 	 * Duplicate operation implementation.
 	 */
-	abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
+	abnf_rule_ri* dupl_impl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const;
 };
 
@@ -137,8 +137,8 @@ void abnf_rule_eof::stream_update_impl(std::istream& is)
 {
 }
 
-abnf_rule_ri* abnf_rule_eof::dupl_impl(const abnf_ruleset& r_set,
+abnf_rule_ri* abnf_rule_eof::dupl_impl(const abnf_ruleset& rset,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_eof(r_set);
+	return new abnf_rule_eof(rset);
 }

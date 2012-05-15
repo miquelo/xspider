@@ -27,14 +27,14 @@ using namespace xspider;
  * abnf_rule implementation
  */
 
-abnf_rule::abnf_rule(const abnf_ruleset& r_set):
-_r_set(r_set)
+abnf_rule::abnf_rule(const abnf_ruleset& rset):
+_rset(rset)
 {
 }
 
 const abnf_ruleset& abnf_rule::ruleset(void) const
 {
-	return _r_set;
+	return _rset;
 }
 
 /*

@@ -61,8 +61,8 @@ public abnf_rule_ri
 	/*
 	 * Initialized empty rule.
 	 */
-	abnf_rule_empty(const abnf_ruleset& r_set):
-	abnf_rule_ri(r_set)
+	abnf_rule_empty(const abnf_ruleset& rset):
+	abnf_rule_ri(rset)
 	{
 	}
 	
@@ -86,7 +86,7 @@ public abnf_rule_ri
 	/*
 	 * Duplicate operation implementation.
 	 */
-	abnf_rule_ri* dupl_impl(const abnf_ruleset& r_set,
+	abnf_rule_ri* dupl_impl(const abnf_ruleset& rset,
 			std::map<const abnf_rule*, abnf_rule_ri*>& d_map) const;
 };
 
@@ -106,10 +106,10 @@ _empty_r(new abnf_rule_empty(*this))
 {
 }
 
-abnf_ruleset::abnf_ruleset(const abnf_ruleset& r_set):
+abnf_ruleset::abnf_ruleset(const abnf_ruleset& rset):
 _empty_r(new abnf_rule_empty(*this))
 {
-	include(r_set);
+	include(rset);
 }
 
 abnf_ruleset::~abnf_ruleset(void)
@@ -119,13 +119,13 @@ abnf_ruleset::~abnf_ruleset(void)
 		delete *it++;
 }
 
-void abnf_ruleset::include(const abnf_ruleset& r_set)
+void abnf_ruleset::include(const abnf_ruleset& rset)
 {
 	std::map<const abnf_rule*, abnf_rule_ri*> d_map;
 	
 	// Duplicates all rules of copied rule set and store them to d_map
-	set<abnf_rule*>::const_iterator a_it = r_set._r_set.begin();
-	while (a_it not_eq r_set._r_set.end())
+	set<abnf_rule*>::const_iterator a_it = rset._r_set.begin();
+	while (a_it not_eq rset._r_set.end())
 		abnf_rule_ri::cast(**a_it++).dupl(*this, d_map);
 		
 	// Store duplicated rules to this rule set
@@ -134,8 +134,8 @@ void abnf_ruleset::include(const abnf_ruleset& r_set)
 		_r_set.insert(it++->second);
 		
 	// Define rules as are defined in copied rule set
-	map<string, abnf_rule*>::const_iterator m_it = r_set._r_map.begin();
-	while (m_it not_eq r_set._r_map.end())
+	map<string, abnf_rule*>::const_iterator m_it = rset._r_map.begin();
+	while (m_it not_eq rset._r_map.end())
 		_r_map[m_it->first] = d_map[m_it++->second];
 }
 
@@ -202,8 +202,8 @@ void abnf_rule_empty::stream_update_impl(std::istream& is)
 {
 }
 
-abnf_rule_ri* abnf_rule_empty::dupl_impl(const abnf_ruleset& r_set,
+abnf_rule_ri* abnf_rule_empty::dupl_impl(const abnf_ruleset& rset,
 		map<const abnf_rule*, abnf_rule_ri*>& d_map) const
 {
-	return new abnf_rule_empty(r_set);
+	return new abnf_rule_empty(rset);
 }
